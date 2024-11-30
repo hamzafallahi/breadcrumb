@@ -91,60 +91,61 @@ export default function Home() {
         initial="hidden"
         animate="visible"
       >
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {esgData.map((category) => (
-              <div key={category.id} className="space-y-6">
-                <ESGCard
-                  category={category}
-                  onClick={() => handleCardClick(category)}
-                  isExpanded={activeCategory === category.id}
-                  isActive={activeCategory === category.id}
-                />
-                
-                <AnimatePresence>
-                  {activeCategory === category.id && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="space-y-4"
-                    >
-                      <ESGArticle articleId={category.id} />
-                      
-                      <div className="pl-4 border-l-2 border-red-200 space-y-4">
-                        {category.subcategories?.map((subCategory) => (
-                          <div key={subCategory.id}>
-                            <ESGCard
-                              category={subCategory}
-                              onClick={() => handleSubCardClick(category.id, subCategory)}
-                              isSubCard
-                              isActive={breadcrumbs[1]?.id === subCategory.id}
-                            />
-                            
-                            <AnimatePresence>
-                              {breadcrumbs[1]?.id === subCategory.id && (
-                                <motion.div
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: 'auto' }}
-                                  exit={{ opacity: 0, height: 0 }}
-                                  transition={{ duration: 0.3 }}
-                                  className="mt-4"
-                                >
-                                  <ESGArticle articleId={subCategory.id} />
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <ESGCard
+                key={category.id}
+                category={category}
+                onClick={() => handleCardClick(category)}
+                isExpanded={activeCategory === category.id}
+                isActive={activeCategory === category.id}
+              />
             ))}
           </div>
+
+          <AnimatePresence mode="wait">
+            {activeCategory && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="mt-8"
+              >
+                <ESGArticle articleId={activeCategory} />
+
+                {findCategory(esgData, activeCategory)?.subcategories && (
+                  <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {findCategory(esgData, activeCategory)?.subcategories?.map((subCategory) => (
+                      <div key={subCategory.id}>
+                        <ESGCard
+                          category={subCategory}
+                          onClick={() => handleSubCardClick(activeCategory, subCategory)}
+                          isSubCard
+                          isActive={breadcrumbs[1]?.id === subCategory.id}
+                        />
+                        
+                        <AnimatePresence>
+                          {breadcrumbs[1]?.id === subCategory.id && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.3 }}
+                              className="mt-4"
+                            >
+                              <ESGArticle articleId={subCategory.id} />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.main>
     </div>
